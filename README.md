@@ -26,7 +26,18 @@ API docs (swagger UI): `http://localhost:5050/swagger/index.html`. Regenerate af
 Tests: `cd root && go vet ./... && go test -race ./...`.
 The Redis-backed tests (CAS, lock, job store) are skipped unless Redis is reachable: `REDIS_ADDR=localhost:6379 go test -race ./...`.
 
-Config (`.env` or environment): `SERVER_PORT` (`:5050`), `DEPENDENCIES_BASE_URL` (`http://localhost:8080`), `REDIS_ADDR` (`localhost:6379`).
+## Configuration (`.env`)
+
+`.env` is gitignored and optional: every variable has a default, so `go run .` works without it. To override, create `root/.env` (read from the directory you run `go run .` in) or set real environment variables, which take precedence over the file.
+
+```sh
+# root/.env  (values shown are the defaults)
+SERVER_PORT=':5050'                          # listen address; change it if 5050 is taken
+DEPENDENCIES_BASE_URL='http://localhost:8080' # WireMock: Product Context, Availability API, event sink
+REDIS_ADDR='localhost:6379'                  # version store, locks, job status
+```
+
+If you change `SERVER_PORT`, use that port in the `curl` examples above.
 
 ## Layout
 
