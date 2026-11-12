@@ -1,0 +1,24 @@
+{{#assign 'productNumber'}}{{regexExtract request.pathSegments.[2] '[0-9]+'}}{{/assign}}
+{{#assign 'colorNumber'}}{{math productNumber '%' 3}}{{/assign}}
+{
+  "productId": "{{request.pathSegments.[2]}}",
+  "productName": "Linen Shirt {{productNumber}}",
+  "brand": {
+    "id": "brand-42",
+    "name": "Atelier Example"
+  },
+  "category": {
+    "id": "cat-shirts",
+    "name": "Shirts"
+  },
+  "color": {
+    "id": "{{#eq colorNumber '1'}}color-white{{/eq}}{{#eq colorNumber '2'}}color-black{{/eq}}{{#eq colorNumber '0'}}color-blue{{/eq}}",
+    "name": "{{#eq colorNumber '1'}}White{{/eq}}{{#eq colorNumber '2'}}Black{{/eq}}{{#eq colorNumber '0'}}Blue{{/eq}}"
+  },
+  "productStatus": "{{parameters.productStatus}}",
+  "sizeId": "{{request.pathSegments.[4]}}",
+  "sizeLabel": "{{#eq request.pathSegments.[4] 'size-34'}}EU 34{{/eq}}{{#eq request.pathSegments.[4] 'size-36'}}EU 36{{/eq}}{{#eq request.pathSegments.[4] 'size-38'}}EU 38{{/eq}}{{#eq request.pathSegments.[4] 'size-40'}}EU 40{{/eq}}{{#eq request.pathSegments.[4] 'size-42'}}EU 42{{/eq}}",
+  "sizeSystem": "EU",
+  "countryCode": "{{request.query.countryCode}}",
+  "countryEnabled": {{parameters.countryEnabled}}
+}

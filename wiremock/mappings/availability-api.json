@@ -1,0 +1,21 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/v1/availability/[^/]+/[^/]+/[^/]+",
+    "queryParameters": {
+      "countryCode": {
+        "equalTo": "PT"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "status": "accepted"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

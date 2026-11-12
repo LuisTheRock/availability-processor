@@ -1,0 +1,23 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/v1/availability/seller-429/[^/]+/[^/]+",
+    "queryParameters": {
+      "countryCode": {
+        "equalTo": "PT"
+      }
+    }
+  },
+  "response": {
+    "status": 429,
+    "jsonBody": {
+      "error": "injected_failure",
+      "message": "Configured 429 response for availability-api."
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Retry-After": "5"
+    }
+  }
+}

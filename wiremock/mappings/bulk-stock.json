@@ -1,0 +1,14 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/fixtures/bulk-stock.csv"
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "bulk-stock.csv",
+    "headers": {
+      "Content-Type": "text/csv; charset=utf-8",
+      "Content-Disposition": "attachment; filename=\"bulk-stock.csv\""
+    }
+  }
+}

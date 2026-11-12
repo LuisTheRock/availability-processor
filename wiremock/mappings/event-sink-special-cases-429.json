@@ -1,0 +1,23 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "urlPath": "/mock-broker/v1/events",
+    "bodyPatterns": [
+      {
+        "matches": "(?s).*\"eventId\"\\s*:\\s*\"fault-429\".*"
+      }
+    ]
+  },
+  "response": {
+    "status": 429,
+    "jsonBody": {
+      "error": "injected_failure",
+      "message": "Configured 429 response for event-sink."
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Retry-After": "5"
+    }
+  }
+}

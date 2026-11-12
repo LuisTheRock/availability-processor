@@ -1,0 +1,26 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPath": "/v1/products/style-9998/sizes/size-38",
+    "queryParameters": {
+      "countryCode": {
+        "equalTo": "PT"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "product-context-template.json",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": [
+      "response-template"
+    ],
+    "transformerParameters": {
+      "productStatus": "ACTIVE",
+      "countryEnabled": false
+    }
+  }
+}

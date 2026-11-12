@@ -1,0 +1,22 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "PUT",
+    "urlPathPattern": "/v1/availability/seller-503/[^/]+/[^/]+",
+    "queryParameters": {
+      "countryCode": {
+        "equalTo": "PT"
+      }
+    }
+  },
+  "response": {
+    "status": 503,
+    "jsonBody": {
+      "error": "injected_failure",
+      "message": "Configured 503 response for availability-api."
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

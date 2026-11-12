@@ -1,0 +1,291 @@
+basePath: /
+definitions:
+  availability.Change:
+    properties:
+      availableQuantity:
+        type: integer
+      countryCode:
+        type: string
+      eventId:
+        type: string
+      eventType:
+        type: string
+      occurredAt:
+        type: string
+      productId:
+        type: string
+      schemaVersion:
+        type: integer
+      sellerId:
+        type: string
+      sizeId:
+        type: string
+      sourceVersion:
+        type: integer
+    type: object
+  availability.Result:
+    properties:
+      reason:
+        type: string
+      status:
+        type: string
+    type: object
+  health.ComponentStatus:
+    properties:
+      details:
+        additionalProperties:
+          type: string
+        type: object
+      status:
+        type: string
+    type: object
+  health.DashboardResponse:
+    properties:
+      components:
+        additionalProperties:
+          $ref: '#/definitions/health.ComponentStatus'
+        type: object
+      livenessState:
+        type: string
+      readinessState:
+        type: string
+      service:
+        type: string
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  health.Response:
+    properties:
+      checks:
+        additionalProperties:
+          $ref: '#/definitions/health.ComponentStatus'
+        type: object
+      service:
+        type: string
+      status:
+        type: string
+      timestamp:
+        type: string
+    type: object
+  imports.CreatedResponse:
+    properties:
+      jobId:
+        type: string
+    type: object
+  imports.RowError:
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+      row:
+        description: 1-based data row, header excluded
+        type: integer
+    type: object
+  imports.StatusResponse:
+    properties:
+      createdAt:
+        type: string
+      errors:
+        items:
+          $ref: '#/definitions/imports.RowError'
+        type: array
+      failed:
+        type: integer
+      jobId:
+        type: string
+      processed:
+        type: integer
+      skipped:
+        type: integer
+      state:
+        type: string
+      succeeded:
+        type: integer
+      total:
+        type: integer
+      updatedAt:
+        type: string
+    type: object
+  web.Response:
+    properties:
+      msg: {}
+    type: object
+info:
+  contact: {}
+  title: Service Availability Processor
+  version: "1.0"
+paths:
+  /_dev/messages:
+    post:
+      consumes:
+      - application/json
+      description: 'Runs the flow a broker consumer would run: validate, version check,
+        product context, availability write, output event. availableQuantity and sourceVersion
+        are required and unknown fields are rejected. A stale or duplicate version
+        is skipped without calling any dependency.'
+      parameters:
+      - description: SellerInventoryChanged event
+        in: body
+        name: event
+        required: true
+        schema:
+          $ref: '#/definitions/availability.Change'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/availability.Result'
+        "400":
+          description: invalid event
+          schema:
+            $ref: '#/definitions/web.Response'
+        "422":
+          description: unknown product, inactive product, or country not enabled
+          schema:
+            $ref: '#/definitions/web.Response'
+        "502":
+          description: a dependency failed after retries, or the output event could
+            not be published
+          schema:
+            $ref: '#/definitions/web.Response'
+        "503":
+          description: stock key busy, or a dependency is throttling (see the Retry-After
+            header)
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Apply one inventory change (test-only ingress)
+      tags:
+      - availability
+  /health:
+    get:
+      description: Returns liveness state, readiness state and per-component status.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/health.DashboardResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/health.DashboardResponse'
+      summary: Health dashboard
+      tags:
+      - health
+  /health/liveness:
+    get:
+      description: Returns UP once startup has completed, otherwise DOWN with 503.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/health.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/health.Response'
+      summary: Liveness probe
+      tags:
+      - health
+  /health/readiness:
+    get:
+      description: Checks every registered dependency; any failure returns DOWN with
+        503.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/health.Response'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/health.Response'
+      summary: Readiness probe
+      tags:
+      - health
+  /v1/availability/imports:
+    post:
+      consumes:
+      - multipart/form-data
+      - text/csv
+      description: 'Columns: sellerId,productId,sizeId,countryCode,availableQuantity,sourceVersion.
+        Send the CSV as a raw text/csv body, or as the multipart field "file" (10
+        MB maximum). Rows are processed in the background through the same flow as
+        single events; poll the job for progress. Malformed rows are reported per
+        row, never as a 400.'
+      parameters:
+      - description: CSV file (multipart upload)
+        in: formData
+        name: file
+        type: file
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Accepted
+          schema:
+            $ref: '#/definitions/imports.CreatedResponse'
+        "400":
+          description: missing or wrong header, empty file, or unreadable body
+          schema:
+            $ref: '#/definitions/web.Response'
+        "413":
+          description: upload larger than 10 MB
+          schema:
+            $ref: '#/definitions/web.Response'
+        "503":
+          description: job store unavailable
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Start an asynchronous CSV import
+      tags:
+      - imports
+  /v1/availability/imports/{jobId}:
+    get:
+      description: Counters are total, processed, succeeded, skipped (stale or duplicate
+        versions) and failed. errors lists failed rows only, capped at 1000 per job.
+        A job whose process died is reported as INTERRUPTED; resubmit the same CSV
+        to finish it.
+      parameters:
+      - description: Job id returned by the upload
+        in: path
+        name: jobId
+        required: true
+        type: string
+      - description: 'Row errors to return: default 100, maximum 1000, 0 for none'
+        in: query
+        name: errorsLimit
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/imports.StatusResponse'
+        "400":
+          description: invalid errorsLimit
+          schema:
+            $ref: '#/definitions/web.Response'
+        "404":
+          description: unknown job
+          schema:
+            $ref: '#/definitions/web.Response'
+        "503":
+          description: job store unavailable
+          schema:
+            $ref: '#/definitions/web.Response'
+      summary: Get the status of an import job
+      tags:
+      - imports
+swagger: "2.0"

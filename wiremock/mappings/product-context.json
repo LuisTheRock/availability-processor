@@ -1,0 +1,26 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "^/v1/products/style-(?:[1-9][0-9]{0,3}|10000)/sizes/(?:size-34|size-36|size-38|size-40|size-42)$",
+    "queryParameters": {
+      "countryCode": {
+        "equalTo": "PT"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "product-context-template.json",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "transformers": [
+      "response-template"
+    ],
+    "transformerParameters": {
+      "productStatus": "ACTIVE",
+      "countryEnabled": true
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/v1/products/style-90001/sizes/[^/]+",
+    "queryParameters": {
+      "countryCode": {
+        "equalTo": "PT"
+      }
+    }
+  },
+  "response": {
+    "status": 429,
+    "jsonBody": {
+      "error": "injected_failure",
+      "message": "Configured 429 response for product-context."
+    },
+    "headers": {
+      "Content-Type": "application/json",
+      "Retry-After": "5"
+    }
+  }
+}

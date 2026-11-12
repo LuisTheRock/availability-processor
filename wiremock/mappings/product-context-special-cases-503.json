@@ -1,0 +1,22 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/v1/products/style-90002/sizes/[^/]+",
+    "queryParameters": {
+      "countryCode": {
+        "equalTo": "PT"
+      }
+    }
+  },
+  "response": {
+    "status": 503,
+    "jsonBody": {
+      "error": "injected_failure",
+      "message": "Configured 503 response for product-context."
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

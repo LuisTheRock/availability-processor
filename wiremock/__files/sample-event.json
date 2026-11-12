@@ -1,0 +1,12 @@
+{
+    "eventId":  "msg-0001",
+    "eventType":  "SellerInventoryChanged",
+    "schemaVersion":  1,
+    "occurredAt":  "2026-10-20T08:00:00Z",
+    "sellerId":  "boutique-42",
+    "productId":  "style-123",
+    "sizeId":  "size-38",
+    "countryCode":  "PT",
+    "availableQuantity":  3,
+    "sourceVersion":  7
+}

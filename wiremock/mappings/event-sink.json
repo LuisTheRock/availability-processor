@@ -1,0 +1,16 @@
+{
+  "priority": 5,
+  "request": {
+    "method": "POST",
+    "urlPath": "/mock-broker/v1/events"
+  },
+  "response": {
+    "status": 202,
+    "jsonBody": {
+      "status": "recorded"
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}

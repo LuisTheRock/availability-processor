@@ -1,0 +1,22 @@
+services:
+  wiremock:
+    image: wiremock/wiremock:3.13.2
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - "./wiremock:/home/wiremock:ro"
+    command:
+      - "--port"
+      - "8080"
+      - "--local-response-templating"
+
+  redis:
+    image: redis:7.4-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis-data:/data
+
+volumes:
+  redis-data:
